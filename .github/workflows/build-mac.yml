@@ -1,0 +1,50 @@
+name: Build macOS app
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Crear archivo .env desde GitHub Secret
+        run: |
+          echo "ORQUEST_API_KEY=${{ secrets.ORQUEST_API_KEY }}" > .env
+
+      - name: Construir app macOS
+        run: |
+          python -m PyInstaller launcher.py \
+            --name ConsultaNominaOrquest \
+            --windowed \
+            --collect-all streamlit \
+            --collect-all altair \
+            --collect-all pyarrow \
+            --add-data "app.py:." \
+            --add-data "orquest_payroll.py:." \
+            --add-data ".env:." \
+            --add-data ".streamlit:.streamlit"
+
+      - name: Comprimir app
+        run: |
+          cd dist
+          zip -r ConsultaNominaOrquest-mac.zip ConsultaNominaOrquest.app
+
+      - name: Subir artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConsultaNominaOrquest-mac
+          path: dist/ConsultaNominaOrquest-mac.zip
