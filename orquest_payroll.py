@@ -22,12 +22,24 @@ def resource_path(relative_path: str) -> Path:
 
 load_dotenv(resource_path(".env"))
 
+def get_orquest_api_key():
+    try:
+        import streamlit as st
+        if "ORQUEST_API_KEY" in st.secrets:
+            return st.secrets["ORQUEST_API_KEY"]
+    except Exception:
+        pass
+
+    return os.getenv("ORQUEST_API_KEY")
 
 def get_headers():
-    api_key = os.getenv("ORQUEST_API_KEY")
+    api_key = get_orquest_api_key()
 
     if not api_key:
-        raise RuntimeError("No se ha encontrado ORQUEST_API_KEY en el archivo .env")
+        raise RuntimeError(
+            "No se ha encontrado ORQUEST_API_KEY. "
+            "Configúrala en .env local o en Secrets de Streamlit Cloud."
+        )
 
     return {
         "Authorization": f"Bearer {api_key}",
