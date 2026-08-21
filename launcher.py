@@ -1,13 +1,20 @@
+import os
 import sys
 import threading
 import webbrowser
 from pathlib import Path
 
-from streamlit.web import cli as stcli
-
 
 PORT = 8501
 URL = f"http://localhost:{PORT}"
+
+# Muy importante: esto debe ir ANTES de importar streamlit
+os.environ["STREAMLIT_GLOBAL_DEVELOPMENT_MODE"] = "false"
+os.environ["STREAMLIT_BROWSER_GATHER_USAGE_STATS"] = "false"
+os.environ["STREAMLIT_SERVER_HEADLESS"] = "true"
+
+
+from streamlit.web import cli as stcli  # noqa: E402
 
 
 def resource_path(relative_path: str) -> Path:
