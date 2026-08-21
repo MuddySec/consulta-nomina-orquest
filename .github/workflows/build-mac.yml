@@ -29,7 +29,6 @@ jobs:
         run: |
           python -m PyInstaller launcher.py \
             --name ConsultaNominaOrquest \
-            --windowed \
             --collect-all streamlit \
             --collect-all altair \
             --collect-all pyarrow \
